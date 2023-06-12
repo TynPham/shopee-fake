@@ -2,7 +2,7 @@ import React, { useContext } from 'react'
 import { useForm } from 'react-hook-form'
 import { Link, useNavigate } from 'react-router-dom'
 import Input from 'src/components/input'
-import { getRules, schemaLogin, SchemaLogin } from 'src/utils/rules'
+import { schema, Schema } from 'src/utils/rules'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { useMutation } from '@tanstack/react-query'
 import { authApi } from 'src/api/auth.api'
@@ -11,7 +11,8 @@ import { ErrorResponse } from 'src/types/util.type'
 import { AppContext } from 'src/contexts/app.context'
 import Button from 'src/components/button/Button'
 
-type FormData = SchemaLogin
+type FormData = Pick<Schema, 'email' | 'password'>
+const loginSchema = schema.pick(['email', 'password'])
 
 export default function Login() {
   const {
@@ -20,7 +21,7 @@ export default function Login() {
     setError,
     formState: { errors }
   } = useForm<FormData>({
-    resolver: yupResolver(schemaLogin)
+    resolver: yupResolver(loginSchema)
   })
 
   const { setIsAuthenticated, setProfile } = useContext(AppContext)
