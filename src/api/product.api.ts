@@ -1,4 +1,4 @@
-import { SuccessResponse } from './../types/util.type'
+import { SuccessResponse } from '../types/util.type'
 import { Product, ProductList, ProductListConfig } from 'src/types/product.type'
 import http from 'src/utils/http'
 
