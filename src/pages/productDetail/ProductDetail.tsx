@@ -1,9 +1,11 @@
 import { useQuery } from '@tanstack/react-query'
 import DOMPurify from 'dompurify'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { productApi } from 'src/api/product.api'
 import InputNumber from 'src/components/inputNumber'
 import ProductRating from 'src/components/productRating'
+import { Product } from 'src/types/product.type'
 
 import { formatCurrency, formatNumberToSocialStyle, rateSale } from 'src/utils/utils'
 
@@ -13,7 +15,54 @@ export default function ProductDetail() {
     queryKey: ['product', id],
     queryFn: () => productApi.getProductById(id as string)
   })
+  const [currentIndexImages, setCurrentIndexImages] = useState([0, 5])
+  const [activeImage, setActiveImage] = useState<string>('')
+  const imageRef = useRef<HTMLImageElement>(null)
   const product = productDetailData?.data.data
+  const currentImage = useMemo(() => {
+    return product ? product?.images.slice(...currentIndexImages) : []
+  }, [product, currentIndexImages])
+
+  useEffect(() => {
+    if (product && product.images.length > 0) {
+      setActiveImage(product?.images[0])
+    }
+  }, [product])
+
+  const next = () => {
+    if (currentIndexImages[1] < (product as Product).images.length) {
+      setCurrentIndexImages((prev) => [prev[0] + 1, prev[1] + 1])
+    }
+  }
+
+  const prev = () => {
+    if (currentIndexImages[0] > 0) {
+      setCurrentIndexImages((prev) => [prev[0] - 1, prev[1] - 1])
+    }
+  }
+
+  const handleZoom = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+    const rect = event.currentTarget.getBoundingClientRect()
+    const image = imageRef.current as HTMLImageElement
+    //c1: lay offsetX, offsetY khi xu ly duoc buddle event
+    // const { offsetX, offsetY } = event.nativeEvent
+    //c2: lay offsetX, offsetY khi khong xu ly duoc buddle event
+    const offsetX = event.pageX - (rect.x - window.scrollX)
+    const offsetY = event.pageY - (rect.y - window.scrollY)
+    const { naturalHeight, naturalWidth } = image
+    const top = offsetY * (1 - naturalHeight / rect.height)
+    const left = offsetX * (1 - naturalWidth / rect.width)
+    image.style.height = naturalHeight + 'px'
+    image.style.width = naturalWidth + 'px'
+    image.style.top = top + 'px'
+    image.style.left = left + 'px'
+    image.style.maxWidth = 'unset'
+  }
+
+  const handleRemoveZoom = () => {
+    imageRef.current?.removeAttribute('style')
+  }
+
   if (!product) return null
   return (
     <div className='bg-gray-200 py-6'>
@@ -21,15 +70,23 @@ export default function ProductDetail() {
         <div className='container'>
           <div className='grid grid-cols-12 gap-9'>
             <div className='col-span-5'>
-              <div className='relative w-full pt-[100%] shadow'>
+              <div
+                className='relative w-full overflow-hidden pt-[100%] shadow'
+                onMouseMove={handleZoom}
+                onMouseLeave={handleRemoveZoom}
+              >
                 <img
-                  src={product.image}
+                  ref={imageRef}
+                  src={activeImage}
                   alt={product.name}
                   className='absolute left-0 top-0 h-full w-full bg-white object-cover'
                 />
               </div>
               <div className='relative mt-4 grid grid-cols-5 gap-1'>
-                <button className='absolute left-0 top-1/2 z-10 h-9 w-5 -translate-y-1/2 bg-black/20 text-white'>
+                <button
+                  className='absolute left-0 top-1/2 z-10 h-9 w-5 -translate-y-1/2 bg-black/20 text-white'
+                  onClick={prev}
+                >
                   <svg
                     xmlns='http://www.w3.org/2000/svg'
                     fill='none'
@@ -41,12 +98,12 @@ export default function ProductDetail() {
                     <path strokeLinecap='round' strokeLinejoin='round' d='M15.75 19.5L8.25 12l7.5-7.5' />
                   </svg>
                 </button>
-                {product.images.slice(0, 5).map((img, index) => {
-                  const isActive = index === 0
+                {currentImage.map((img) => {
+                  const isActive = img === activeImage
                   return (
-                    <div className='relative w-full pt-[100%]' key={img}>
+                    <div className='relative w-full pt-[100%]' key={img} onMouseEnter={() => setActiveImage(img)}>
                       <img
-                        src={product.image}
+                        src={img}
                         alt={product.name}
                         className='absolute left-0 top-0 h-full w-full cursor-pointer bg-white object-cover'
                       />
@@ -54,7 +111,10 @@ export default function ProductDetail() {
                     </div>
                   )
                 })}
-                <button className='absolute right-0 top-1/2 z-10 h-9 w-5 -translate-y-1/2 bg-black/20 text-white'>
+                <button
+                  className='absolute right-0 top-1/2 z-10 h-9 w-5 -translate-y-1/2 bg-black/20 text-white'
+                  onClick={next}
+                >
                   <svg
                     xmlns='http://www.w3.org/2000/svg'
                     fill='none'
