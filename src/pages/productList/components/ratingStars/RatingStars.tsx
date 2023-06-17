@@ -1,7 +1,7 @@
 import React from 'react'
 import { Link, createSearchParams, useNavigate } from 'react-router-dom'
-import { QueryConfig } from '../../ProductList'
 import path from 'src/constants/path'
+import { QueryConfig } from 'src/hook/useQueryConfig'
 
 interface RatingStarsProps {
   queryConfig: QueryConfig
