@@ -1,12 +1,14 @@
 import React, { useState } from 'react'
 import InputNumber from '../inputNumber'
 import { InputNumberProps } from '../inputNumber/InputNumber'
+import classNames from 'classnames'
 
 interface QuantityControllerProps extends InputNumberProps {
   max?: number
   onIncrease?: (value: number) => void
   onDecrease?: (value: number) => void
   onType?: (value: number) => void
+  onFocusOut?: (value: number) => void
   classNameWrapper?: string
 }
 
@@ -15,8 +17,10 @@ export default function QuantityController({
   onIncrease,
   onDecrease,
   onType,
+  onFocusOut,
   classNameWrapper = 'ml-10',
   value,
+  disabled,
   ...rest
 }: QuantityControllerProps) {
   const [localValue, setLocalValue] = useState<number>(Number(value || 1))
@@ -47,10 +51,19 @@ export default function QuantityController({
     setLocalValue(_value)
   }
 
+  const handleFocusOut = (event: React.FocusEvent<HTMLInputElement, Element>) => {
+    onFocusOut && onFocusOut(Number(event.target.value))
+  }
+
   return (
     <div className={`${classNameWrapper} flex items-center`}>
       <button
-        className='flex h-8 w-8 items-center justify-center rounded-l-sm border border-gray-300 text-gray-600'
+        className={classNames(
+          'flex h-8 w-8 items-center justify-center rounded-l-sm border border-gray-300 text-gray-600',
+          {
+            'pointer-events-none cursor-not-allowed': disabled
+          }
+        )}
         onClick={handleDecrease}
       >
         <svg
@@ -69,11 +82,17 @@ export default function QuantityController({
         classNameError='hidden'
         classNameInput='h-8 w-14 border-t border-b border-gray-300 p-1 text-center outline-none'
         onChange={handleType}
+        onBlur={handleFocusOut}
         value={value || localValue}
         {...rest}
       />
       <button
-        className='flex h-8 w-8 items-center justify-center rounded-r-sm border border-gray-300 text-gray-600'
+        className={classNames(
+          'flex h-8 w-8 items-center justify-center rounded-r-sm border border-gray-300 text-gray-600',
+          {
+            'pointer-events-none cursor-not-allowed': disabled
+          }
+        )}
         onClick={handleIncrease}
       >
         <svg
