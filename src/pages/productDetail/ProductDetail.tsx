@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import DOMPurify from 'dompurify'
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { productApi } from 'src/api/product.api'
 import ProductRating from 'src/components/productRating'
 import { Product as ProductType, ProductListConfig } from 'src/types/product.type'
@@ -11,10 +11,12 @@ import QuantityController from 'src/components/quantityController'
 import purchaseApi from 'src/api/purchase.api'
 import { toast } from 'react-toastify'
 import { purchasesStatus } from 'src/constants/purchase'
+import path from 'src/constants/path'
 
 export default function ProductDetail() {
   const [buyCount, setBuyCount] = useState<number>(1)
   const { nameId } = useParams()
+  const navigate = useNavigate()
   const id = getIdFromNameId(nameId as string)
   const queryClient = useQueryClient()
   const { data: productDetailData } = useQuery({
@@ -95,6 +97,12 @@ export default function ProductDetail() {
         }
       }
     )
+  }
+
+  const handelBuyNow = async () => {
+    const res = await addToCartMutation.mutateAsync({ product_id: product?._id as string, buy_count: buyCount })
+    const purchase = res.data.data
+    navigate(path.cart, { state: { purchaseId: purchase._id } })
   }
 
   if (!product) return null
@@ -227,7 +235,10 @@ export default function ProductDetail() {
                   </svg>
                   Thêm vào giỏ hàng
                 </button>
-                <button className='fkex ml-4 h-12 min-w-[5rem] items-center justify-center rounded-sm bg-orange px-5 capitalize text-white shadow-sm outline-none hover:bg-orange/90'>
+                <button
+                  className='fkex ml-4 h-12 min-w-[5rem] items-center justify-center rounded-sm bg-orange px-5 capitalize text-white shadow-sm outline-none hover:bg-orange/90'
+                  onClick={handelBuyNow}
+                >
                   Mua ngay
                 </button>
               </div>
