@@ -92,7 +92,10 @@ export default function NavHeader(props: NavHeaderProps) {
           <Link to={path.historyPurchase} className='flex'>
             <div className='mr-2 h-6 w-6 flex-shrink-0'>
               <img
-                src='https://lh3.google.com/u/0/ogw/AOLn63EL4GOYWnRDdDNe1_f1MIfQsS6TK4QaQfkB2Fmg=s32-c-mo'
+                src={
+                  profile?.avatar ||
+                  'https://lh3.google.com/u/0/ogw/AOLn63EL4GOYWnRDdDNe1_f1MIfQsS6TK4QaQfkB2Fmg=s32-c-mo'
+                }
                 alt='avatar'
                 className='h-full w-full rounded-full object-cover'
               />

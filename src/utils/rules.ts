@@ -99,3 +99,15 @@ export const schema = yup.object({
 })
 
 export type Schema = yup.InferType<typeof schema>
+
+export const userSchema = yup.object({
+  name: yup.string().max(160, 'Name must not exceed 160 characters'),
+  phone: yup.string().max(120, 'Name must not exceed 120 characters'),
+  address: yup.string().max(160, 'Name must not exceed 160 characters'),
+  date_of_birth: yup.date().max(new Date(), 'Date is invalid'),
+  avatar: yup.string().max(1000, 'Name must not exceed 1000 characters'),
+  password: schema.fields['password'],
+  new_password: schema.fields['password'],
+  confirm_password: schema.fields['confirm_password']
+})
+export type UserSchema = yup.InferType<typeof userSchema>
