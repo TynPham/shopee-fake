@@ -2,6 +2,7 @@ import { useContext } from 'react'
 import { Link } from 'react-router-dom'
 import path from 'src/constants/path'
 import { AppContext } from 'src/contexts/app.context'
+import { getAvatarUrl } from 'src/utils/utils'
 
 export interface UserSideNavProps {}
 
@@ -11,13 +12,7 @@ export default function UserSideNav(props: UserSideNavProps) {
     <div>
       <div className='flex items-center border-b border-b-gray-200 py-4'>
         <Link to={path.profile} className='h-12 w-12 flex-shrink-0 overflow-hidden rounded-full border border-black/10'>
-          <img
-            src={
-              profile?.avatar || 'https://lh3.google.com/u/0/ogw/AOLn63EL4GOYWnRDdDNe1_f1MIfQsS6TK4QaQfkB2Fmg=s32-c-mo'
-            }
-            alt=''
-            className='h-full w-full object-cover'
-          />
+          <img src={getAvatarUrl(profile?.avatar)} alt='' className='h-full w-full object-cover' />
         </Link>
         <div className='flex-grow pl-4'>
           <div className='mb-1 truncate font-semibold text-gray-600'>PhamTuyen</div>
