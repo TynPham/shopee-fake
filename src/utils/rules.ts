@@ -67,6 +67,15 @@ function testPriceMinMax(this: yup.TestContext<yup.AnyObject>) {
   return price_min !== '' || price_max !== ''
 }
 
+function handleRuleCFPassword(ref: string) {
+  return yup
+    .string()
+    .required('Confirm password is required')
+    .min(6, 'Password must be 6 - 160 characters')
+    .max(160, 'Password must be 6 - 160 characters')
+    .oneOf([yup.ref(ref)], 'Confirm password must be match')
+}
+
 export const schema = yup.object({
   email: yup
     .string()
@@ -79,12 +88,7 @@ export const schema = yup.object({
     .required('Password is required')
     .min(6, 'Password must be 6 - 160 characters')
     .max(160, 'Password must be 6 - 160 characters'),
-  confirm_password: yup
-    .string()
-    .required('Confirm password is required')
-    .min(6, 'Password must be 6 - 160 characters')
-    .max(160, 'Password must be 6 - 160 characters')
-    .oneOf([yup.ref('password')], 'Confirm password must be match'),
+  confirm_password: handleRuleCFPassword('password'),
   price_min: yup.string().test({
     name: 'price-not-allowed',
     message: 'Giá không phù hợp',
@@ -108,6 +112,6 @@ export const userSchema = yup.object({
   avatar: yup.string().max(1000, 'Name must not exceed 1000 characters'),
   password: schema.fields['password'],
   new_password: schema.fields['password'],
-  confirm_password: schema.fields['confirm_password']
+  confirm_password: handleRuleCFPassword('new_password')
 })
 export type UserSchema = yup.InferType<typeof userSchema>

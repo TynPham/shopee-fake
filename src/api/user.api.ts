@@ -2,10 +2,7 @@ import { User } from 'src/types/user.type'
 import { SuccessResponse } from 'src/types/util.type'
 import http from 'src/utils/http'
 
-export interface BodyUpdateProfile extends Omit<User, '_id' | 'roles' | 'createdAt' | 'updatedAt' | 'email'> {
-  password?: string
-  newPassword?: string
-}
+export interface BodyUpdateProfile extends Omit<User, '_id' | 'roles' | 'createdAt' | 'updatedAt' | 'email'> {}
 export const userApi = {
   getProfile: () => http.get<SuccessResponse<User>>('me'),
   updateProfile: (body: BodyUpdateProfile) => http.put<SuccessResponse<User>>('user', body),

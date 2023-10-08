@@ -1,6 +1,6 @@
 import { yupResolver } from '@hookform/resolvers/yup'
 import { useMutation, useQuery } from '@tanstack/react-query'
-import React, { useContext, useEffect, useMemo, useRef, useState } from 'react'
+import { useContext, useEffect, useMemo, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { BodyUpdateProfile, userApi } from 'src/api/user.api'
 import Button from 'src/components/button/Button'
@@ -12,9 +12,9 @@ import { toast } from 'react-toastify'
 import { setProfileFromLS } from 'src/utils/auth'
 import { AppContext } from 'src/contexts/app.context'
 import DateSelect from '../../components/dateSelect'
-import config from 'src/constants/config'
 import { getAvatarUrl, isAxiosUnprocessableEntityError } from 'src/utils/utils'
 import { ErrorResponse } from 'src/types/util.type'
+import InputFile from 'src/components/inputFile'
 
 type FormDataUser = Pick<UserSchema, 'address' | 'avatar' | 'date_of_birth' | 'name' | 'phone'>
 type FormDataUserError = Omit<FormDataUser, 'date_of_birth'>
@@ -22,7 +22,6 @@ const profileSchema = userSchema.pick(['address', 'avatar', 'date_of_birth', 'na
 
 export default function Profile() {
   const { setProfile } = useContext(AppContext)
-  const uploadAvatarRef = useRef<HTMLInputElement>(null)
   const [file, setFile] = useState<File>()
   const previewAvatar: string = useMemo(() => (file ? URL.createObjectURL(file) : ''), [file])
   const {
@@ -67,19 +66,8 @@ export default function Profile() {
     }
   }, [profile, setValue])
 
-  const onChooseAvatar = () => {
-    uploadAvatarRef.current?.click()
-  }
-
-  const handleUploadAvatar = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const fileLocal = event.target.files && event.target.files[0]
-    if (fileLocal && (fileLocal?.size >= config.maxSizeAvatarUpload || !fileLocal.type.startsWith('image'))) {
-      toast.error('The maximum file size is 1 MB. Format: .JPEG, .PNG', {
-        position: 'top-center'
-      })
-    } else {
-      setFile(fileLocal as File)
-    }
+  const handleChangeFile = (file?: File) => {
+    setFile(file)
   }
 
   const handleOnSubmit = handleSubmit(async (data) => {
@@ -196,23 +184,7 @@ export default function Profile() {
                 className='h-full w-full rounded-full object-cover'
               />
             </div>
-            <input
-              className='hidden'
-              type='file'
-              accept='.jpg,.jpeg,.png'
-              ref={uploadAvatarRef}
-              onChange={handleUploadAvatar}
-              onClick={(event: React.MouseEvent<HTMLInputElement, MouseEvent>) => {
-                ;(event.target as any).value = null
-              }}
-            />
-            <button
-              type='button'
-              className='flex h-10 items-center justify-end rounded-sm border bg-white px-6 text-sm text-gray-600 shadow-sm'
-              onClick={onChooseAvatar}
-            >
-              Chọn ảnh
-            </button>
+            <InputFile onChange={handleChangeFile} />
             <div className='mt-3 text-gray-400'>
               <div>Dụng lượng file tối đa 1 MB</div>
               <div>Định dạng:.JPEG, .PNG</div>

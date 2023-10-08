@@ -6,7 +6,7 @@ const path = {
   user: '/user',
   profile: '/user/profile',
   changePassword: '/user/password',
-  historyPurchase: '/user/purchase',
+  historyPurchase: '/user/historyPurchase',
   productDetail: ':nameId',
   cart: '/cart'
 } as const
