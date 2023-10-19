@@ -1,5 +1,6 @@
 import axios, { AxiosError, HttpStatusCode } from 'axios'
 import config from 'src/constants/config'
+import { ErrorResponse } from 'src/types/util.type'
 
 export const isAxiosError = <T>(error: unknown): error is AxiosError<T> => {
   // eslint-disable-next-line import/no-named-as-default-member
@@ -8,6 +9,17 @@ export const isAxiosError = <T>(error: unknown): error is AxiosError<T> => {
 
 export const isAxiosUnprocessableEntityError = <FormData>(error: unknown): error is AxiosError<FormData> => {
   return isAxiosError(error) && error.response?.status === HttpStatusCode.UnprocessableEntity
+}
+
+export const isUnauthorizedAxiosError = <UnauthorizedError>(error: unknown): error is AxiosError<UnauthorizedError> => {
+  return isAxiosError(error) && error.response?.status === HttpStatusCode.Unauthorized
+}
+
+export const isExpireTokenAxiosError = <UnauthorizedError>(error: unknown): error is AxiosError<UnauthorizedError> => {
+  return (
+    isUnauthorizedAxiosError<ErrorResponse<{ name: string; message: string }>>(error) &&
+    error.response?.data.data?.name === 'EXPIRED_TOKEN'
+  )
 }
 
 export const formatCurrency = (currency: number) => {

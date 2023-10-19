@@ -75,6 +75,7 @@ export default function Login() {
                 register={register}
                 name='password'
                 errors={errors.password?.message}
+                classNameEye='absolute top-[14px] right-[5px] h-5 w-5 cursor-pointer'
               />
               <div className='mt-3'>
                 <Button
